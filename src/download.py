@@ -1,3 +1,4 @@
+import argparse
 import calendar
 import io
 import os
@@ -108,11 +109,11 @@ def download_month_data(session, year, month, output_dir, vs, ev, gen):
         return False
 
 
-def download_all_months(year, output_dir):
+def download_all_months(year, output_dir, num_months=12):
     os.makedirs(output_dir, exist_ok=True)
     session = requests.Session()
 
-    print(f"--- Downloading {year} Data ---")
+    print(f"--- Downloading {year} Data ({num_months} months) ---")
 
     # 1. Handshake (Get Tokens)
     vs, ev, gen = get_tokens(session)
@@ -120,7 +121,7 @@ def download_all_months(year, output_dir):
         return
 
     # 2. Loop through months
-    for month in range(1, 13):
+    for month in range(1, num_months + 1):
         month_name = calendar.month_name[month]
         filename = f"{month}_{year}_ontime.csv"
         filepath = os.path.join(output_dir, filename)
@@ -153,7 +154,24 @@ def download_all_months(year, output_dir):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Download flight data CSV files from BTS"
+    )
+    parser.add_argument(
+        "num_months",
+        type=int,
+        nargs="?",
+        default=12,
+        help="Number of months to download (default: 12)",
+    )
+    args = parser.parse_args()
+
+    # Validate input
+    if args.num_months < 1 or args.num_months > 12:
+        print("Error: num_months must be between 1 and 12")
+        exit(1)
+
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)  # Go up one level from src/
     output_dir = os.path.join(project_root, "data", "raw")
-    download_all_months(2025, output_dir)
+    download_all_months(2025, output_dir, args.num_months)
