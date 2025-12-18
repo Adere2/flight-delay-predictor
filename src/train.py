@@ -40,7 +40,7 @@ def validate(model, loader, crit_reg, crit_cls, device):
 def train_pipeline(data_dir, models_dir, epochs=10, batch_size=64):
     # 1. Setup
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Starting Training Pipeline on {device}...")
+    print(f"RUNNING ON {device}...")
 
     # 2. Find Files
     # If the user passed a directory, grab all .csv files inside
