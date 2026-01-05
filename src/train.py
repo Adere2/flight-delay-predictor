@@ -1,4 +1,4 @@
-import glob  # <--- NEW: To find files
+import glob
 import os
 import pickle
 
@@ -39,8 +39,15 @@ def validate(model, loader, crit_reg, crit_cls, device):
 
 def train_pipeline(data_dir, models_dir, epochs=10, batch_size=64):
     # 1. Setup
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"RUNNING ON {device}...")
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print("Using CUDA (NVIDIA GPU)")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using MPS (Apple Silicon)")
+    else:
+        device = torch.device("cpu")
+        print("Using CPU")
 
     # 2. Find Files
     # If the user passed a directory, grab all .csv files inside
